@@ -1,5 +1,5 @@
 {
-  "name": "serialize",
+  "name": "serialize-obj",
   "version": "0.0.1",
   "description": "Serialize A -> B",
   "main": "index.js",
