@@ -1,0 +1,27 @@
+{
+  "name": "serialize",
+  "version": "0.0.1",
+  "description": "Serialize A -> B",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thehydroimpulse/serialize.git"
+  },
+  "keywords": [
+    "serialize",
+    "model",
+    "promise"
+  ],
+  "author": "Daniel Fagnan <dnfagnan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thehydroimpulse/serialize/issues"
+  },
+  "homepage": "https://github.com/thehydroimpulse/serialize"
+}
