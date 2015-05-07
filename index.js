@@ -33,26 +33,28 @@ Serializer.prototype = {
     var self = this;
     var fresh = {};
 
-    return new Promise(function(resolve, reject) {
-      var fns = [];
+    var fns = [];
 
-      // Loop through the mappings and perform the operation onto the
-      // incoming object.
-      self._mappings.forEach(function(map) {
-        // Grab the value of the key:
-        var val = obj[map.key];
+    // Loop through the mappings and perform the operation onto the
+    // incoming object.
+    self._mappings.forEach(function(map) {
+      // Grab the value of the key:
+      var val = obj[map.key];
 
-        if ('string' === typeof map.to) {
-          fresh[map.to] = val;
-        } else if ('function' === typeof map.to) {
-          fns.push(map.to(val));
-          // fresh[mapTo.key] = mapTo.value;
-        }
+      if ('string' === typeof map.to) {
+        fresh[map.to] = val;
+      } else if ('function' === typeof map.to) {
+        fns.push(map.to(val));
+        // fresh[mapTo.key] = mapTo.value;
+      }
+    });
+
+    return Promise.all(fns).then(function(maps) {
+      maps.forEach(function(map) {
+        fresh[map.key] = map.value;
       });
 
-      return Promise.all(fns);
-    }).then(function(fns) {
-      console.log(fns);
+      return fresh;
     });
   },
 

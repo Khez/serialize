@@ -1,6 +1,6 @@
 {
   "name": "serialize-obj",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Serialize A -> B",
   "main": "index.js",
   "directories": {

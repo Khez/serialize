@@ -29,7 +29,7 @@ describe('serializer', function() {
     assert.equal(team._mappings.length, 1);
   });
 
-  it('should serialize a single static map', function() {
+  it('should serialize a single static map', function(done) {
     var team = serializer('team')
       .map('token', 'id');
 
@@ -39,10 +39,11 @@ describe('serializer', function() {
       assert.deepEqual(obj, {
         id: 1
       });
+      done();
     });
   });
 
-  it('should serialize with a dynamic function mapping.', function() {
+  it('should serialize with a dynamic function mapping.', function(done) {
     var user = serializer('user')
       .map('team_id', function(id) {
         return {
@@ -57,10 +58,11 @@ describe('serializer', function() {
       assert.deepEqual(obj, {
         team: 3
       });
+      done();
     });
   });
 
-  it('should serialize with a promise mapping.', function() {
+  it('should serialize with a promise mapping.', function(done) {
 
     var findTeam = function(id) {
       return new Promise(function(resolve, reject) {
@@ -79,6 +81,7 @@ describe('serializer', function() {
       assert.deepEqual(obj, {
         team: 7
       });
+      done();
     });
 
   });
