@@ -1,3 +1,5 @@
+var Promise = require('bluebird');
+
 exports = module.exports = function(name, obj) {
   if (obj && exports.collection[name]) {
     return exports.collection[name].serialize(obj);
@@ -31,15 +33,27 @@ Serializer.prototype = {
     var self = this;
     var fresh = {};
 
-    // Loop through the mappings and perform the operation onto the
-    // incoming object.
-    this._mappings.forEach(function(map) {
-      // Grab the value of the key:
-      var val = obj[map.key];
-      fresh[map.to] = val;
-    });
+    return new Promise(function(resolve, reject) {
+      var fns = [];
 
-    return fresh;
+      // Loop through the mappings and perform the operation onto the
+      // incoming object.
+      self._mappings.forEach(function(map) {
+        // Grab the value of the key:
+        var val = obj[map.key];
+
+        if ('string' === typeof map.to) {
+          fresh[map.to] = val;
+        } else if ('function' === typeof map.to) {
+          fns.push(map.to(val));
+          // fresh[mapTo.key] = mapTo.value;
+        }
+      });
+
+      return Promise.all(fns);
+    }).then(function(fns) {
+      console.log(fns);
+    });
   },
 
   map: function(key, value) {

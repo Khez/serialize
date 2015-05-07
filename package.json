@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/thehydroimpulse/serialize/issues"
   },
-  "homepage": "https://github.com/thehydroimpulse/serialize"
+  "homepage": "https://github.com/thehydroimpulse/serialize",
+  "dependencies": {
+    "bluebird": "^2.9.25"
+  }
 }

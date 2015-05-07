@@ -1,5 +1,6 @@
 var assert = require('assert');
 var serializer = require('..');
+var Promise = require('bluebird');
 var Serializer = serializer.Serializer;
 
 describe('serializer', function() {
@@ -34,10 +35,51 @@ describe('serializer', function() {
 
     var serialized = team.serialize({
       token: 1
+    }).then(function(obj) {
+      assert.deepEqual(obj, {
+        id: 1
+      });
+    });
+  });
+
+  it('should serialize with a dynamic function mapping.', function() {
+    var user = serializer('user')
+      .map('team_id', function(id) {
+        return {
+          key: 'team',
+          value: id + 1
+        };
+      });
+
+    var serialized = user.serialize({
+      team_id: 2
+    }).then(function(obj) {
+      assert.deepEqual(obj, {
+        team: 3
+      });
+    });
+  });
+
+  it('should serialize with a promise mapping.', function() {
+
+    var findTeam = function(id) {
+      return new Promise(function(resolve, reject) {
+        resolve({ key: 'team', value: id + 5 });
+      });
+    };
+
+    var invite = serializer('invite')
+      .map('team_id', function(id) {
+        return findTeam(id);
+      });
+
+    var serialized = invite.serialize({
+      team_id: 2
+    }).then(function(obj) {
+      assert.deepEqual(obj, {
+        team: 7
+      });
     });
 
-    assert.deepEqual(serialized, {
-      id: 1
-    });
   });
 });
