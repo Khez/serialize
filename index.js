@@ -1,68 +1,53 @@
-var Promise = require('bluebird');
+'use strict';
+var bluebird = require('bluebird');
+var collection = {};
 
-exports = module.exports = function(name, obj) {
-  if (obj && exports.collection[name]) {
-    return exports.collection[name].serialize(obj);
+module.exports = fetchSerializer;
+module.exports.collection = collection;
+module.exports.Serializer = Serializer;
+module.exports.clear = clearCollection;
+
+function fetchSerializer(name) {
+  if (!collection[name]) {
+    collection[name] = new Serializer(name);
   }
 
-  if (obj && !exports.collection[name]) {
-    throw new Error('Serializer [' + name + '] was not found.');
+  return collection[name];
+}
+
+function clearCollection() {
+  for (var key in collection) {
+    delete collection[key];
   }
-
-  var obj = new Serializer(name);
-  exports.collection.push(obj);
-  exports.collection[name] = obj;
-
-  return obj;
-};
-
-exports.collection = [];
-exports.Serializer = Serializer;
-
-exports.clear = function() {
-  exports.collection.length = 0;
-};
+}
 
 function Serializer(name) {
   this.name = name;
-  this._mappings = [];
+  this._mappings = {};
 }
 
-Serializer.prototype = {
-  serialize: function(obj) {
-    var self = this;
-    var fresh = {};
-
-    var fns = [];
-
-    // Loop through the mappings and perform the operation onto the
-    // incoming object.
-    self._mappings.forEach(function(map) {
-      // Grab the value of the key:
-      var val = obj[map.key];
-
-      if ('string' === typeof map.to) {
-        fresh[map.to] = val;
-      } else if ('function' === typeof map.to) {
-        fns.push(map.to(val));
-        // fresh[mapTo.key] = mapTo.value;
-      }
-    });
-
-    return Promise.all(fns).then(function(maps) {
-      maps.forEach(function(map) {
-        fresh[map.key] = map.value;
-      });
-
-      return fresh;
-    });
-  },
-
-  map: function(key, value) {
-    this._mappings.push({
-      key: key,
-      to: value
-    });
-    return this;
-  }
+Serializer.prototype.serialize = function(object) {
+  return bluebird.props(this.build(object));
 };
+
+Serializer.prototype.build = function(object) {
+  var fresh = {};
+  for (var key in this._mappings) {
+    fresh[key] = this._mappings[key](object);
+  }
+  return fresh;
+};
+
+Serializer.prototype.map = function(key, from) {
+  if (typeof from !== 'function') {
+    from = getProp.bind(null, from);
+  }
+
+  this._mappings[key] = from;
+
+  return this;
+};
+
+function getProp(key, object) {
+  return object[key];
+}
